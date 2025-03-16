@@ -1,12 +1,12 @@
 window.onload = function() {
-    // 初始化角色列表（可用于其他用途）
+    // Initialize character list (may be used for other purposes)
     characterList = [];
     getJsonObject('data.json',
         function(data) {
             characterList = data;
             console.log(characterList);
             console.log(characterList[0]);
-            // 加载书籍数据
+            // Load book data
             loadBooks();
         },
         function(xhr) { console.error(xhr); }
@@ -16,8 +16,7 @@ window.onload = function() {
 const books = [];
 var cart = [];
 
-
-// 使用 AJAX 异步读取 JSON 文件
+// Use AJAX to asynchronously read a JSON file
 function getJsonObject(path, success, error) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
@@ -33,7 +32,7 @@ function getJsonObject(path, success, error) {
     xhr.send();
 }
 
-// 从 JSON 文件中加载书籍数据
+// Load book data from the JSON file
 function loadBooks() {
     getJsonObject('data.json',
         function(data) {
@@ -45,13 +44,13 @@ function loadBooks() {
 }
 
 function getStars(rating) {
-    const numRating = parseInt(rating, 10); // 确保是数字
-    const fullStars = "★".repeat(numRating); // 填满的星星
-    const emptyStars = "☆".repeat(5 - numRating); // 剩余的空星
+    const numRating = parseInt(rating, 10); // Ensure it is a number
+    const fullStars = "★".repeat(numRating); // Filled stars
+    const emptyStars = "☆".repeat(5 - numRating); // Remaining empty stars
     return fullStars + emptyStars;
 }
 
-// 将书籍数据显示到表格中
+// Display book data in the table
 function displayBooks(bookList) {
     const tableBody = document.querySelector("#book-table tbody");
     tableBody.innerHTML = "";
@@ -62,7 +61,7 @@ function displayBooks(bookList) {
             <td><input type="checkbox" name="add-to-cart" value="${book.title}"></td>
             <td><img src="${book.img}" alt="${book.title}" width="50"></td>
             <td>${book.title}</td>
-            <td class = "rating">${getStars(book.rating)}</td>
+            <td class="rating">${getStars(book.rating)}</td>
             <td>${book.authors}</td>
             <td>${book.year}</td>
             <td>${book.price}</td>
@@ -73,12 +72,12 @@ function displayBooks(bookList) {
     });
 }
 
-// 对当前显示的书籍行进行搜索高亮（搜索功能不改变显示列表）
+// Highlight search results in the current book list (search function does not change the displayed list)
 function highlightSearch() {
     const searchTerm = document.getElementById("search-input").value.toLowerCase();
     const rows = document.querySelectorAll("#book-table tbody tr");
     rows.forEach(function(row) {
-        const title = row.cells[1].textContent.toLowerCase();
+        const title = row.cells[2].textContent.toLowerCase(); // Third column
         if (searchTerm !== "" && title.includes(searchTerm)) {
             row.style.backgroundColor = "yellow";
         } else {
@@ -87,70 +86,87 @@ function highlightSearch() {
     });
 }
 
-// 结合类别过滤和搜索高亮
+// Apply category filter and highlight search results
 function applyFilters() {
     let filteredBooks = books;
     const selectedCategory = document.getElementById("category-filter").value.trim().toLowerCase();
-    // 当选择的类别不是“all”或默认提示时，进行过滤
+
+    // Filter books only if the selected category is not "all" or the default placeholder
     if (selectedCategory !== "all" && selectedCategory !== "category") {
         filteredBooks = filteredBooks.filter(book => book.category.toLowerCase() === selectedCategory);
     }
     displayBooks(filteredBooks);
-    // 在过滤后的结果中再进行搜索高亮
+
+    // Apply search highlighting to the filtered results
     highlightSearch();
 }
 
-// 搜索按钮的点击事件：只进行搜索高亮，不改变列表
+// Search button click event: only highlight search results without changing the list
 function SearchBooks() {
     highlightSearch();
 }
 
-// 过滤按钮的点击事件：按类别过滤后，再应用搜索高亮
+// Filter button click event: filter by category first, then apply search highlighting
 function filterBooks() {
-    applyFilters();
+    const category = document.getElementById("category-filter").value.toLowerCase();
+
+    // Filter books based on the selected category
+    let filteredBooks = category === "all" ? books : books.filter(book => book.category.toLowerCase() === category);
+
+    // Display filtered books
+    displayBooks(filteredBooks);
+
+    // Apply search highlighting
+    highlightSearch();
 }
 
-// 通过事件委托处理点击“添加到购物车”复选框的事件
+// Prevent filter button from triggering form submission
+document.querySelector("#filterBox button").addEventListener("click", function(event) {
+    event.preventDefault(); // Prevent form submission
+    filterBooks(); // Call filter function
+});
+
+// Handle "Add to Cart" checkbox click event using event delegation
 document.querySelector("#book-table").addEventListener("click", function(e) {
     if (e.target.name === "add-to-cart") {
         var bookTitle = e.target.value;
         addToCart(bookTitle);
-        // 添加后清除选中状态（保持书籍在列表中可见）
+        // Clear selection after adding (to keep books visible in the list)
         e.target.checked = false;
     }
 });
 
-// 根据书籍标题找到对应的书籍，并提示用户输入数量后添加至购物车
+// Find the selected book by title, prompt the user for quantity, and add to cart
 function addToCart() {
-    // 获取所有被选中的复选框
+    // Get all selected checkboxes
     const checkboxes = document.querySelectorAll('input[name="add-to-cart"]:checked');
 
-    // 确保只允许选择一本书
+    // Ensure only one book can be selected at a time
     if (checkboxes.length === 0) {
-        alert("请先选择一本书！");
+        alert("Please select a book first!");
         return;
     } else if (checkboxes.length > 1) {
-        alert("每次只能添加一本书，请取消多选！");
+        alert("You can only add one book at a time. Please deselect multiple choices!");
         return;
     }
 
-    // 获取用户选择的书籍
-    const bookTitle = checkboxes[0].value; // 只允许选择一本
+    // Get the selected book title
+    const bookTitle = checkboxes[0].value; // Only allow one selection
     const selectedBook = books.find(book => book.title === bookTitle);
 
     if (!selectedBook) {
-        alert("未找到该书籍，请重试！");
+        alert("Book not found. Please try again!");
         return;
     }
 
-    // 让用户输入数量
-    const quantity = prompt(`请输入《${selectedBook.title}》的数量:`);
+    // Prompt user to enter quantity
+    const quantity = prompt(`Enter quantity for "${selectedBook.title}":`);
 
-    // 校验输入数量
-    //边界情况处理：空输入；非数字；零和负数；允许重复添加
+    // Validate quantity input
+    // Edge cases: empty input, non-numeric input, zero/negative numbers, allow repeated additions
     if (quantity && !isNaN(quantity) && parseInt(quantity, 10) > 0) {
         const parsedQuantity = parseInt(quantity, 10);
-        console.log(`添加 ${parsedQuantity} 本 ${selectedBook.title} 到购物车`);
+        console.log(`Added ${parsedQuantity} copies of ${selectedBook.title} to the cart`);
 
         const cartItem = cart.find(item => item.title === selectedBook.title);
 
@@ -160,26 +176,26 @@ function addToCart() {
             cart.push({...selectedBook, quantity: parsedQuantity });
         }
 
-        // 确保购物车数据已更新
-        console.log("购物车数据：", cart);
+        // Ensure cart data is updated
+        console.log("Cart Data:", cart);
 
-        // 更新购物车数量
+        // Update cart total quantity
         updateCartTotal();
 
-        // 取消复选框选中状态
+        // Deselect checkbox after adding
         checkboxes[0].checked = false;
     } else {
-        alert("请输入有效的数量！");
+        alert("Please enter a valid quantity!");
     }
 }
 
-// 更新购物车中总数量的显示
+// Update the total quantity displayed in the cart
 function updateCartTotal() {
     const total = cart.reduce((sum, item) => sum + item.quantity, 0);
     document.getElementById("cartquantity").textContent = `(${total})`;
 }
 
-// 重置购物车前进行确认提示
+// Confirm before resetting the cart
 function resetCart() {
     if (confirm("Are you sure you want to reset the cart?")) {
         cart = [];
@@ -187,8 +203,7 @@ function resetCart() {
     }
 }
 
-// 深色模式切换：为 body 元素添加或移除 dark-mode 类
+// Toggle dark mode by adding or removing the "dark-mode" class from the body
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
-
 }
