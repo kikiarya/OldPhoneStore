@@ -73,10 +73,11 @@ body {
 }
 
 .container2 {
+    width: 99%;
     padding: 10px;
-    border: 1px solid #95BEF0;
     margin: 10px auto;
-    width: 98%;
+    display: flex;
+    flex-direction: column;
 }
 
 .bar {
@@ -89,17 +90,16 @@ div#listBox {
     margin: 0.25em auto;
     padding: 1em;
     border: 1pt solid #95BEF0;
-    width: 98%;
-}
-
-div#listBox {
+    width: 100%;
     margin-top: 1em;
     background-color: #FAFCFF;
+    box-sizing: border-box;
 }
 
 table {
     border: collapse;
     border-spacing: 0;
+    width: 100%;
 }
 
 table tbody td {
@@ -123,6 +123,13 @@ table tbody td:first-child {
     padding: 0.5em 0em;
 }
 
+
+/* modify the font style of title by the third part of tbody */
+
+table tbody td:nth-child(3) {
+    font-style: italic;
+}
+
 caption {
     background-color: #95BEF0;
     padding: 0.5em 0.5em;
@@ -142,30 +149,30 @@ caption {
 .dark-mode {
     background-color: #2d2d2d;
     color: #e0e0e0;
-}
-
-.dark-mode #header,
-.dark-mode .container1,
-.dark-mode .container2,
-.dark-mode table {
-    background-color: #3d3d3d;
-    border-color: #555;
-}
-
-.dark-mode table th {
-    background-color: #4a4a4a;
-}
-
-.dark-mode button {
-    background-color: #666;
-}
-
-.dark-mode input[type="text"],
-.dark-mode select {
-    background-color: #555;
-    color: #fff;
-}
-
-.dark-mode .bar {
-    background-color: #4a4a4a;
+    & #header,
+    & .container1,
+    & .container2,
+    & table {
+        background-color: #3d3d3d;
+        border-color: #555;
+    }
+    & table th {
+        background-color: #4a4a4a;
+    }
+    & button {
+        background-color: #666;
+        color: #fff;
+    }
+    & button:hover {
+        color: #ffcc00;
+        /* Optional: Change color when hovering */
+    }
+    & input[type="text"],
+    & select {
+        background-color: #555;
+        color: #fff;
+    }
+    & .bar {
+        background-color: #3b3b3b;
+    }
 }
