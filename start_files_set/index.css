@@ -13,25 +13,36 @@ body {
     font-size: 80%;
 }
 
-#name {
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* vertically center align items */
     background-color: #EBF4FB;
     padding: 10px;
-    text-align: center;
     margin: 10px auto;
     width: 98%;
 }
 
-#darkModeToggle {
-    text-align: right;
+#name {
+    margin: 0;
+    /* remove default margin */
+    flex-grow: 1;
+    /* Allow the title to take up available space */
+    text-align: center;
+    /* centered */
+}
+
+#darkModeToggle button {
+    padding: 5px 10px;
+    font-size: 14px;
 }
 
 .container1 {
     display: flex;
     background-color: #EBF4FB;
-    /* 蓝色背景 */
     padding: 10px;
     border: 1px solid #95BEF0;
-    /* 蓝色边框 */
     margin: 10px auto;
     width: 98%;
     gap: 5px;
@@ -39,10 +50,8 @@ body {
 
 .box {
     background-color: #FAFCFF;
-    /* 浅蓝色背景 */
     padding: 10px;
     border: 1px solid #95BEF0;
-    /* 蓝色边框 */
     border-radius: 20px;
 }
 
@@ -52,7 +61,7 @@ body {
 }
 
 
-/* 使 cartBox 和 ResetBox 靠右显示 */
+/* Align cartBox and ResetBox to the right */
 
 #cartBox {
     margin-left: auto;
@@ -64,19 +73,23 @@ body {
 }
 
 .container2 {
-    background-color: #EBF4FB;
     padding: 10px;
     border: 1px solid #95BEF0;
     margin: 10px auto;
     width: 98%;
 }
 
+.bar {
+    width: 100%;
+    height: 40px;
+    background-color: #95BEF0;
+}
+
 div#listBox {
     margin: 0.25em auto;
-    background-color: #EBF4FB;
     padding: 1em;
     border: 1pt solid #95BEF0;
-    width: 80%;
+    width: 98%;
 }
 
 div#listBox {
@@ -121,7 +134,6 @@ caption {
     color: gold;
     font-size: 18px;
     letter-spacing: 2px;
-    /* 让星星间隔更均匀 */
 }
 
 
@@ -132,6 +144,7 @@ caption {
     color: #e0e0e0;
 }
 
+.dark-mode #header,
 .dark-mode .container1,
 .dark-mode .container2,
 .dark-mode table {
@@ -151,4 +164,8 @@ caption {
 .dark-mode select {
     background-color: #555;
     color: #fff;
+}
+
+.dark-mode .bar {
+    background-color: #4a4a4a;
 }
