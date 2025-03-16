@@ -79,7 +79,7 @@ function highlightSearch() {
     rows.forEach(function(row) {
         const title = row.cells[2].textContent.toLowerCase(); // Third column
         if (searchTerm !== "" && title.includes(searchTerm)) {
-            row.style.backgroundColor = "yellow";
+            row.style.backgroundColor = "pink";
         } else {
             row.style.backgroundColor = "";
         }
@@ -204,6 +204,6 @@ function resetCart() {
 }
 
 // Toggle dark mode by adding or removing the "dark-mode" class from the body
-function toggleDarkMode() {
+function DarkMode() {
     document.body.classList.toggle('dark-mode');
 }
