@@ -9,19 +9,15 @@
 </head>
 
 <body>
-
-    <h1 id="name">
-        Online Book Shop
-    </h1>
-
-    <!-- darkmode -->
-    <div id="darkModeToggle">
-        <button type="button" onclick="toggleDarkMode()">Dark Mode</button>
+    <div id="header">
+        <h1 id="name">B2YBooks Online Shop</h1>
+        <div id="darkModeToggle">
+            <button type="button" onclick="toggleDarkMode()">Dark Mode</button>
+        </div>
     </div>
 
     <form method="get" action="">
         <div class="container1">
-
             <div id="searchBox">
                 <input type="text" id="search-input">
                 <button type="button" onclick="SearchBooks()">search</button>
@@ -29,14 +25,16 @@
 
             <div id="filterBox">
                 <select id="category-filter">
-               <option value ="All ">Category</option>
-               <option value ="Art">Art</option>
-               <option value ="Science History ">Science History</option>
-               <option value ="Action and Adventure ">Action and Adventure</option>
-               <option value ="Health ">Health</option>
-               <option value ="Science Fiction ">Science Fiction</option>
+                    <option value="All">Category</option>
+                    <option value="Art">Art</option>
+                    <option value="Science History">Science History</option>
+                    <option value="Action and Adventure">Action and Adventure</option>
+                    <option value="Health">Health</option>
+                    <option value="Science Fiction">Science Fiction</option>
+                    <!-- for boundary tests -->
+                    <option value=""not-avaiable">Not Avaliable</option>
                 </select>
-                <button type="button " onclick="filterBooks() ">filter</button>
+                <button type="button" onclick="filterBooks()">filter</button>
             </div>
 
             <div id="cartBox">
@@ -57,17 +55,18 @@
         </div>
 
         <div class="container2">
-
-            <div id="listBox ">
+            <div id="listBox">
+                <div class="bar"></div>
                 <table id="book-table">
                     <thead>
                         <tr>
                             <th></th>
-                            <!-- 复选框列，无表头显示 -->
+                            <!-- CheckBox column, no header text -->
                             <th></th>
-                            <!-- 图片列，无表头显示 -->
-                            <th class="title-column">Title</th>
-                            <th></th>
+                            <!-- Image column, no header text -->
+                            <th>Title</th>
+                            <!-- rating column, no header text -->
+                            <th>Rating</th>
                             <th>Authors</th>
                             <th>Year</th>
                             <th>Price</th>
@@ -76,7 +75,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- 书籍数据将被插入到这里 -->
+                        <!-- Book data -->
                     </tbody>
                 </table>
             </div>
