@@ -86,32 +86,21 @@ function highlightSearch() {
     });
 }
 
-// Apply category filter and highlight search results
-function applyFilters() {
-    let filteredBooks = books;
-    const selectedCategory = document.getElementById("category-filter").value.trim().toLowerCase();
-
-    // Filter books only if the selected category is not "all" or the default placeholder
-    if (selectedCategory !== "all" && selectedCategory !== "category") {
-        filteredBooks = filteredBooks.filter(book => book.category.toLowerCase() === selectedCategory);
-    }
-    displayBooks(filteredBooks);
-
-    // Apply search highlighting to the filtered results
-    highlightSearch();
-}
-
 // Search button click event: only highlight search results without changing the list
 function SearchBooks() {
     highlightSearch();
 }
 
-// Filter button click event: filter by category first, then apply search highlighting
+
+// Apply category filter and highlight search results
 function filterBooks() {
     const category = document.getElementById("category-filter").value.toLowerCase();
+    let filteredBooks = books;
 
     // Filter books based on the selected category
-    let filteredBooks = category === "all" ? books : books.filter(book => book.category.toLowerCase() === category);
+    if (category !== "all" && category !== "category" && category !== "not-available") {
+        filteredBooks = filteredBooks.filter(book => book.category.toLowerCase() === category);
+    }
 
     // Display filtered books
     displayBooks(filteredBooks);
@@ -204,6 +193,6 @@ function resetCart() {
 }
 
 // Toggle dark mode by adding or removing the "dark-mode" class from the body
-function DarkMode() {
+function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
 }
