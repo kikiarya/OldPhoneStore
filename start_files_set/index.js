@@ -82,7 +82,7 @@ function updateDisplay() {
     const category = document.getElementById("category-filter").value.toLowerCase();
     const searchTerm = document.getElementById("search-input").value.toLowerCase();
 
-    //1. filter books
+    // 1. Filter books based on category
     let filteredBooks = books;
 
     if (category === "not-available") {
@@ -93,22 +93,21 @@ function updateDisplay() {
         filteredBooks = books.filter(book => book.category.toLowerCase() === category);
     }
 
-    //2. search books
+    // 2. Search books by title (considering title as string even if it is a number)
     if (searchTerm) {
-        filteredBooks = filteredBooks.filter(book => book.title.toLowerCase().includes(searchTerm));
+        filteredBooks = filteredBooks.filter(book => book.title.toString().toLowerCase().includes(searchTerm));
     }
 
-    //for combine
+    // For combined search and filter
     currentbooks = filteredBooks;
     displayBooks(currentbooks);
 
     // Apply search highlighting
     applySearchHighlight(searchTerm);
 
-    // If no books are found for the selected category, show an empty message
+    // If no books are found for the selected category or search, show an empty message
     if (filteredBooks.length === 0) {
         alert("No matching books found");
-
     }
 }
 
@@ -136,16 +135,16 @@ function applySearchHighlight(searchTerm) {
         return;
     }
 
-    // change color of highlight when it is the dark mode 深色模式改高亮颜色
+    // Change color of highlight based on dark mode
     let highlightColor;
-    const isDarkMode = document.body.classList.contains('dark-mode'); //if it is dark mode
+    const isDarkMode = document.body.classList.contains('dark-mode'); // if it is dark mode
     if (isDarkMode) {
         highlightColor = "blue";
     } else {
         highlightColor = "pink";
     }
 
-    //if is matched
+    // If matched, highlight row
     let hasMatch = false;
     const rows = document.querySelectorAll("#book-table tbody tr");
 
@@ -158,7 +157,6 @@ function applySearchHighlight(searchTerm) {
             row.style.backgroundColor = "";
         }
     });
-
 }
 
 
