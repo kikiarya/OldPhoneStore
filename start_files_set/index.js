@@ -76,9 +76,65 @@ function displayBooks(bookList) {
     });
 }
 
+let currentbooks = books;
+//combine search and filter
+function updateDisplay() {
+    const category = document.getElementById("category-filter").value.toLowerCase();
+    const searchTerm = document.getElementById("search-input").value.toLowerCase();
+
+    //1. filter books
+    let filteredBooks = books;
+
+    if (category === "not-available") {
+        filteredBooks = books.filter(book => !book.available); // Filter books where available is false
+    } else if (category === "all") {
+        filteredBooks = books;
+    } else {
+        filteredBooks = books.filter(book => book.category.toLowerCase() === category);
+    }
+
+    //2. search books
+    if (searchTerm) {
+        filteredBooks = filteredBooks.filter(book => book.title.toLowerCase().includes(searchTerm));
+    }
+
+    //for combine
+    currentbooks = filteredBooks;
+    displayBooks(currentbooks);
+
+    // Apply search highlighting
+    applySearchHighlight(searchTerm);
+
+    // If no books are found for the selected category, show an empty message
+    if (filteredBooks.length === 0) {
+        alert("No matching books found");
+
+    }
+}
+
 // Search button click event: only highlight search results without changing the list
 function SearchBooks() {
     const searchTerm = document.getElementById("search-input").value.toLowerCase();
+
+    //boundary test
+    if (!searchTerm) {
+        alert("Please enter a term.");
+        return;
+    }
+
+    updateDisplay();
+}
+
+
+function filterBooks() {
+    updateDisplay();
+}
+
+
+function applySearchHighlight(searchTerm) {
+    if (!searchTerm) {
+        return;
+    }
 
     // change color of highlight when it is the dark mode 深色模式改高亮颜色
     let highlightColor;
@@ -92,6 +148,7 @@ function SearchBooks() {
     //if is matched
     let hasMatch = false;
     const rows = document.querySelectorAll("#book-table tbody tr");
+
     rows.forEach(function(row) {
         const title = row.cells[2].textContent.toLowerCase(); // Third column
         if (searchTerm !== "" && title.includes(searchTerm)) {
@@ -101,36 +158,9 @@ function SearchBooks() {
             row.style.backgroundColor = "";
         }
     });
-    if (!hasMatch && searchTerm != "") {
-        alert("No matching book found!")
-    }
+
 }
 
-
-function filterBooks() {
-    const category = document.getElementById("category-filter").value.toLowerCase();
-    let filteredBooks = books;
-
-    // If the user selects "Not Available", filter books based on availability
-    if (category === "not-available") {
-        filteredBooks = books.filter(book => !book.available); // Filter books where available is false
-    }
-    // Otherwise, filter books based on the selected category
-    else if (category === "all") {
-        filteredBooks = books;
-    } else {
-        filteredBooks = books.filter(book => book.category.toLowerCase() === category);
-    }
-
-    // If no books are found for the selected category, show an empty message
-    if (filteredBooks.length === 0) {
-        alert("There are no books in this category");
-    }
-    displayBooks(filteredBooks);
-
-    // Apply search highlighting
-    SearchBooks();
-}
 
 // Prevent filter button from triggering form submission
 document.querySelector("#filterBox button").addEventListener("click", function(event) {
@@ -212,6 +242,8 @@ function resetCart() {
     if (confirm("Are you sure you want to reset the cart?")) {
         cart = [];
         updateCartTotal();
+    } else {
+        alert("the action was canceled");
     }
 }
 
