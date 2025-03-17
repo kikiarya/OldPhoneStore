@@ -1,18 +1,3 @@
-window.onload = function() {
-    // Initialize character list (may be used for other purposes)
-    characterList = [];
-    getJsonObject('data.json',
-        function(data) {
-            characterList = data;
-            console.log(characterList);
-            console.log(characterList[0]);
-            // Load book data
-            loadBooks();
-        },
-        function(xhr) { console.error(xhr); }
-    );
-};
-
 const books = [];
 var cart = [];
 
@@ -33,15 +18,34 @@ function getJsonObject(path, success, error) {
 }
 
 // Load book data from the JSON file
-function loadBooks() {
+window.onload = function() {
+    // Initialize character list
+    characterList = [];
     getJsonObject('data.json',
         function(data) {
+            characterList = data;
+            console.log(characterList);
+            console.log(characterList[0]);
+            // here you can call methods to load or refresh the page 
+            // loadCharacters() or refreshPage()
             books.push(...data);
             displayBooks(books);
         },
         function(xhr) { console.error(xhr); }
     );
-}
+
+    //switch darkmode and light mode
+    const savedTheme = localStorage.getItem('theme');
+    const button = document.querySelector("#darkModeToggle button");
+
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        button.textContent = "Light Mode";
+    } else {
+        button.textContent = "Dark Mode";
+    }
+};
+
 
 function getStars(rating) {
     const numRating = parseInt(rating, 10); // Ensure it is a number
@@ -72,41 +76,60 @@ function displayBooks(bookList) {
     });
 }
 
-// Highlight search results in the current book list (search function does not change the displayed list)
-function highlightSearch() {
+// Search button click event: only highlight search results without changing the list
+function SearchBooks() {
     const searchTerm = document.getElementById("search-input").value.toLowerCase();
+
+    // change color of highlight when it is the dark mode 深色模式改高亮颜色
+    let highlightColor;
+    const isDarkMode = document.body.classList.contains('dark-mode'); //if it is dark mode
+    if (isDarkMode) {
+        highlightColor = "blue";
+    } else {
+        highlightColor = "pink";
+    }
+
+    //if is matched
+    let hasMatch = false;
     const rows = document.querySelectorAll("#book-table tbody tr");
     rows.forEach(function(row) {
         const title = row.cells[2].textContent.toLowerCase(); // Third column
         if (searchTerm !== "" && title.includes(searchTerm)) {
-            row.style.backgroundColor = "pink";
+            row.style.backgroundColor = highlightColor;
+            hasMatch = true;
         } else {
             row.style.backgroundColor = "";
         }
     });
+    if (!hasMatch && searchTerm != "") {
+        alert("No matching book found!")
+    }
 }
 
-// Search button click event: only highlight search results without changing the list
-function SearchBooks() {
-    highlightSearch();
-}
 
-
-// Apply category filter and highlight search results
 function filterBooks() {
     const category = document.getElementById("category-filter").value.toLowerCase();
     let filteredBooks = books;
 
-    // Filter books based on the selected category
-    if (category !== "all" && category !== "category" && category !== "not-available") {
-        filteredBooks = filteredBooks.filter(book => book.category.toLowerCase() === category);
+    // If the user selects "Not Available", filter books based on availability
+    if (category === "not-available") {
+        filteredBooks = books.filter(book => !book.available); // Filter books where available is false
+    }
+    // Otherwise, filter books based on the selected category
+    else if (category === "all") {
+        filteredBooks = books;
+    } else {
+        filteredBooks = books.filter(book => book.category.toLowerCase() === category);
     }
 
-    // Display filtered books
+    // If no books are found for the selected category, show an empty message
+    if (filteredBooks.length === 0) {
+        alert("There are no books in this category");
+    }
     displayBooks(filteredBooks);
 
     // Apply search highlighting
-    highlightSearch();
+    SearchBooks();
 }
 
 // Prevent filter button from triggering form submission
@@ -195,4 +218,13 @@ function resetCart() {
 // Toggle dark mode by adding or removing the "dark-mode" class from the body
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
+    const button = document.querySelector("#darkModeToggle button");
+
+    if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem('theme', 'dark');
+        button.textContent = "Light Mode"; // 切换为浅色模式
+    } else {
+        localStorage.setItem('theme', 'light');
+        button.textContent = "Dark Mode"; // 切换为深色模式
+    }
 }
