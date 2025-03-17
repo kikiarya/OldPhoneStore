@@ -89,6 +89,7 @@ function updateDisplay() {
         filteredBooks = books.filter(book => !book.available); // Filter books where available is false
     } else if (category === "all") {
         filteredBooks = books;
+        alert("No category selected");
     } else {
         filteredBooks = books.filter(book => book.category.toLowerCase() === category);
     }
