@@ -34,7 +34,7 @@ window.onload = function() {
         function(xhr) { console.error(xhr); }
     );
 
-    //switch darkmode and light mode
+    //switch between darkmode and light mode
     const savedTheme = localStorage.getItem('theme');
     const button = document.querySelector("#darkModeToggle button");
 
@@ -77,26 +77,32 @@ function displayBooks(bookList) {
 }
 
 let currentbooks = books;
-//combine search and filter
+
+// Combine search and filter
 function updateDisplay() {
+    const searchTerm = document.getElementById("search-input").value.trim().toLowerCase();
     const category = document.getElementById("category-filter").value.toLowerCase();
-    const searchTerm = document.getElementById("search-input").value.toLowerCase();
 
     // 1. Filter books based on category
     let filteredBooks = books;
 
     if (category === "not-available") {
-        filteredBooks = books.filter(book => !book.available); // Filter books where available is false
+        filteredBooks = books.filter(function(book) {
+            return !book.available; // Filter books where available is false
+        });
     } else if (category === "all") {
-        filteredBooks = books;
-        alert("No category selected");
+        filteredBooks = books; // Show all books
     } else {
-        filteredBooks = books.filter(book => book.category.toLowerCase() === category);
+        filteredBooks = books.filter(function(book) {
+            return book.category.toLowerCase() === category; // Filter by category
+        });
     }
 
     // 2. Search books by title (considering title as string even if it is a number)
     if (searchTerm) {
-        filteredBooks = filteredBooks.filter(book => book.title.toString().toLowerCase().includes(searchTerm));
+        filteredBooks = filteredBooks.filter(function(book) {
+            return book.title.toString().toLowerCase().includes(searchTerm); // Search by title
+        });
     }
 
     // For combined search and filter
@@ -106,31 +112,28 @@ function updateDisplay() {
     // Apply search highlighting
     applySearchHighlight(searchTerm);
 
-    // If no books are found for the selected category or search, show an empty message
-    if (filteredBooks.length === 0) {
-        alert("No matching books found");
-    }
+
 }
 
 // Search button click event: only highlight search results without changing the list
 function SearchBooks() {
     const searchTerm = document.getElementById("search-input").value.toLowerCase();
 
-    //boundary test
-    if (!searchTerm) {
-        alert("Please enter a term.");
+    // Boundary test for empty or invalid search term
+    if (!searchTerm || searchTerm === " ") {
+        alert("Please enter a valid term.");
         return;
     }
 
-    updateDisplay();
+    applySearchHighlight(searchTerm); // Only apply search highlighting
 }
 
-
+// Filter books function (filter only)
 function filterBooks() {
-    updateDisplay();
+    updateDisplay(); // Update display after filtering
 }
 
-
+// Apply search highlighting based on search term
 function applySearchHighlight(searchTerm) {
     if (!searchTerm) {
         return;
@@ -138,7 +141,7 @@ function applySearchHighlight(searchTerm) {
 
     // Change color of highlight based on dark mode
     let highlightColor;
-    const isDarkMode = document.body.classList.contains('dark-mode'); // if it is dark mode
+    const isDarkMode = document.body.classList.contains('dark-mode'); // Check if it is dark mode
     if (isDarkMode) {
         highlightColor = "blue";
     } else {
@@ -146,19 +149,24 @@ function applySearchHighlight(searchTerm) {
     }
 
     // If matched, highlight row
-    let hasMatch = false;
     const rows = document.querySelectorAll("#book-table tbody tr");
+    let hasMatch = false;
 
     rows.forEach(function(row) {
-        const title = row.cells[2].textContent.toLowerCase(); // Third column
-        if (searchTerm !== "" && title.includes(searchTerm)) {
-            row.style.backgroundColor = highlightColor;
+        const title = row.cells[2].textContent.trim().toLowerCase(); // Third column (book title)
+        if (title.includes(searchTerm)) {
+            row.style.backgroundColor = highlightColor; // Apply background color for matched rows
             hasMatch = true;
         } else {
-            row.style.backgroundColor = "";
+            row.style.backgroundColor = ""; // Clear background color for non-matched rows
         }
     });
+
+    if (!hasMatch) {
+        alert("No matching books found");
+    }
 }
+
 
 
 // Prevent filter button from triggering form submission
