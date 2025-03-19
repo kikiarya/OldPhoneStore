@@ -57,8 +57,8 @@ window.onload = function() {
 
 function getStars(rating) {
     const numRating = parseInt(rating, 10); // Ensure it is a number
-    const fullStars = "★".repeat(numRating); // Filled stars
-    const emptyStars = "☆".repeat(5 - numRating); // Remaining empty stars
+    const fullStars = '<img src = "images/star-16.ico" alt="★" width ="6">'.repeat(numRating); // Filled stars
+    const emptyStars = '<img src = "images/outline-star-16.ico" alt = "☆" width = "6">'.repeat(5 - numRating); // Remaining empty stars
     return fullStars + emptyStars;
 }
 
