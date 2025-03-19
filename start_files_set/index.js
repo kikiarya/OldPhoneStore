@@ -34,6 +34,13 @@ window.onload = function() {
         function(xhr) { console.error(xhr); }
     );
 
+    //to ensure cartquantity not disappear when refresh the page
+    const savedCartQuantity = localStorage.getItem('cartquantity');
+
+    if (savedCartQuantity) {
+        document.getElementById("cartquantity").textContent = `(${savedCartQuantity})`;
+    }
+
     //switch between darkmode and light mode
     const savedTheme = localStorage.getItem('theme');
     const button = document.querySelector("#darkModeToggle button");
@@ -44,6 +51,7 @@ window.onload = function() {
     } else {
         button.textContent = "Dark Mode";
     }
+
 };
 
 
@@ -74,6 +82,18 @@ function displayBooks(bookList) {
         `;
         tableBody.appendChild(row);
     });
+
+    //ensure only one checkbox would be selected at a time
+    var checkboxes = document.querySelectorAll('input[name="add-to-cart"]');
+    for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].addEventListener("click", function() {
+            for (var j = 0; j < checkboxes.length; j++) {
+                if (checkboxes[j] !== this) {
+                    checkboxes[j].checked = false;
+                }
+            }
+        });
+    }
 }
 
 let currentbooks = books;
@@ -96,6 +116,10 @@ function updateDisplay() {
         filteredBooks = books.filter(function(book) {
             return book.category.toLowerCase() === category; // Filter by category
         });
+
+        if (filteredBooks.length === 0) {
+            alert("No matching books found for the selected category.");
+        }
     }
 
     // 2. Search books by title (considering title as string even if it is a number)
@@ -163,7 +187,7 @@ function applySearchHighlight(searchTerm) {
     });
 
     if (!hasMatch) {
-        alert("No matching books found");
+        alert("No matching books found for your search term.");
     }
 }
 
@@ -236,12 +260,15 @@ function addToCart() {
     } else {
         alert("Please enter a valid quantity!");
     }
+
+
 }
 
 // Update the total quantity displayed in the cart
 function updateCartTotal() {
     const total = cart.reduce((sum, item) => sum + item.quantity, 0);
     document.getElementById("cartquantity").textContent = `(${total})`;
+    localStorage.setItem('cartquantity', total);
 }
 
 // Confirm before resetting the cart
@@ -249,6 +276,7 @@ function resetCart() {
     if (confirm("Are you sure you want to reset the cart?")) {
         cart = [];
         updateCartTotal();
+        localStorage.removeItem('cart');
     } else {
         alert("the action was canceled");
     }
@@ -261,9 +289,9 @@ function toggleDarkMode() {
 
     if (document.body.classList.contains('dark-mode')) {
         localStorage.setItem('theme', 'dark');
-        button.textContent = "Light Mode"; // 切换为浅色模式
+        button.textContent = "Light Mode";
     } else {
         localStorage.setItem('theme', 'light');
-        button.textContent = "Dark Mode"; // 切换为深色模式
+        button.textContent = "Dark Mode";
     }
 }
