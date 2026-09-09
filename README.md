@@ -28,7 +28,7 @@
 - **FAQ RAG** — 保修 / 物流 / 退货 / 成色等知识库检索
 - **Tool 调用** — 搜手机、查订单、列秒杀活动
 - **多轮记忆** — Redis 保存近期对话上下文
-- **可选大模型** — 配置 `OPENAI_API_KEY`（兼容 OpenAI 接口）后由 LLM 生成回复；未配置时走本地规则引擎，功能仍可完整演示
+- **可选大模型** — 通过 OpenAI 兼容接口接入 **OpenAI / DeepSeek / Kimi**（`LLM_PROVIDER` + `LLM_API_KEY`）；未配置时走本地规则引擎，功能仍可完整演示
 - **流式输出** — 支持 SSE（`stream: true`）
 
 ```mermaid
@@ -67,7 +67,7 @@ docker compose up --build -d
 - **Catalog** — 搜索 / 品牌 / 成色筛选，详情接口带 `X-Cache-Source`
 - **Cart checkout** — 事务扣库存 + 幂等下单
 - **Flash deals** — 首页秒杀区，登录后抢购
-- **Chat widget** — 智能客服；配 `OPENAI_API_KEY` 可接大模型
+- **Chat widget** — 智能客服；可接 OpenAI / DeepSeek / Kimi，或纯本地 RAG+Tools
 - **Admin** — 营收 / 库存 / 订单状态 / 超时扫描
 
 ---

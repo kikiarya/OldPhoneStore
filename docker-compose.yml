@@ -24,10 +24,15 @@ services:
       REDIS_URL: redis://redis:6379
       JWT_SECRET: change-me-in-production-oldphonestore
       ORDER_TIMEOUT_MINUTES: "15"
-      # Optional LLM for smarter chat (leave empty to use local RAG + tools)
-      # OPENAI_API_KEY:
-      # OPENAI_BASE_URL: https://api.openai.com/v1
-      # OPENAI_MODEL: gpt-4o-mini
+      # Optional LLM (openai | deepseek | kimi) — leave unset for local RAG + tools
+      # LLM_PROVIDER: deepseek
+      # LLM_API_KEY:
+      # LLM_MODEL: deepseek-chat
+      # Kimi example:
+      # LLM_PROVIDER: kimi
+      # LLM_API_KEY:
+      # LLM_MODEL: moonshot-v1-8k
+      # OPENAI_API_KEY still works as an alias for LLM_API_KEY
     volumes:
       - phone-data:/app/data
     depends_on:

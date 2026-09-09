@@ -8,6 +8,7 @@ const { connectRedis, isRedisReady, closeRedis } = require('./redis');
 const { seed } = require('./seed');
 const { startOrderWorker, startTimeoutScanner, stopOrderWorker } = require('./services/orderWorker');
 const { warmAllActiveDeals } = require('./services/seckillService');
+const { resolveLlmConfig, listProviders } = require('./services/llmConfig');
 
 const authRouter = require('./routes/auth');
 const phonesRouter = require('./routes/phones');
@@ -28,6 +29,7 @@ app.get('/api/health', (_req, res) => {
   const db = getDb();
   const phones = db.prepare('SELECT COUNT(*) AS c FROM phones').get().c;
   const users = db.prepare('SELECT COUNT(*) AS c FROM users').get().c;
+  const llm = resolveLlmConfig();
   res.json({
     status: 'ok',
     service: 'OldPhoneStore',
@@ -35,6 +37,13 @@ app.get('/api/health', (_req, res) => {
     redis: isRedisReady(),
     phones,
     users,
+    llm: {
+      enabled: llm.enabled,
+      provider: llm.provider,
+      label: llm.label,
+      model: llm.model,
+      providers: listProviders()
+    },
     features: [
       'jwt-auth',
       'redis-cache',

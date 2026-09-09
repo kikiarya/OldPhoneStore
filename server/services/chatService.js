@@ -3,6 +3,7 @@ const path = require('path');
 const { randomUUID } = require('crypto');
 const { getDb } = require('../db');
 const { getRedis, isRedisReady } = require('../redis');
+const { resolveLlmConfig } = require('./llmConfig');
 
 const FAQ = JSON.parse(
   fs.readFileSync(path.join(__dirname, '..', 'knowledge', 'faq.json'), 'utf8')
@@ -140,19 +141,17 @@ function detectIntent(text) {
 }
 
 async function callLlm(messages) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const baseUrl = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '');
-  const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
-  if (!apiKey) return null;
+  const cfg = resolveLlmConfig();
+  if (!cfg.enabled) return null;
 
-  const res = await fetch(`${baseUrl}/chat/completions`, {
+  const res = await fetch(`${cfg.baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${cfg.apiKey}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model,
+      model: cfg.model,
       temperature: 0.4,
       messages
     })
@@ -160,7 +159,7 @@ async function callLlm(messages) {
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`LLM error ${res.status}: ${body.slice(0, 200)}`);
+    throw new Error(`LLM(${cfg.label}) error ${res.status}: ${body.slice(0, 200)}`);
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content || null;
@@ -168,7 +167,9 @@ async function callLlm(messages) {
 
 function buildLocalReply(userText, toolsUsed) {
   const parts = [];
-  parts.push('我是 OldPhoneStore 智能客服（本地 RAG + Tool 模式，未配置 OPENAI_API_KEY 时走规则引擎）。');
+  parts.push(
+    '我是 OldPhoneStore 智能客服（本地 RAG + Tool 模式；未配置 LLM_API_KEY / OPENAI_API_KEY 时走规则引擎）。'
+  );
 
   if (toolsUsed.faq?.length) {
     parts.push('\n【知识库】');
@@ -235,6 +236,7 @@ async function chat({ sessionId, userId, message }) {
   const memory = await getMemory(sid);
   let reply = null;
   let mode = 'local-rag';
+  const llmCfg = resolveLlmConfig();
 
   try {
     const system = `You are OldPhoneStore customer support for a certified pre-owned phone shop.
@@ -246,14 +248,19 @@ Tool JSON: ${JSON.stringify(toolsUsed)}`;
       ...memory.slice(-8).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content })),
       { role: 'user', content: message }
     ]);
-    if (reply) mode = 'llm';
+    if (reply) mode = `llm:${llmCfg.provider}`;
   } catch (err) {
     console.warn('[chat] LLM fallback:', err.message);
   }
 
   if (!reply) reply = buildLocalReply(message, toolsUsed);
 
-  saveMessage(sid, 'assistant', reply, { intent, mode, tools: Object.keys(toolsUsed) });
+  saveMessage(sid, 'assistant', reply, {
+    intent,
+    mode,
+    provider: llmCfg.enabled ? llmCfg.provider : null,
+    tools: Object.keys(toolsUsed)
+  });
   await pushMemory(sid, 'assistant', reply);
 
   return {
@@ -261,6 +268,9 @@ Tool JSON: ${JSON.stringify(toolsUsed)}`;
     reply,
     intent,
     mode,
+    llm: llmCfg.enabled
+      ? { provider: llmCfg.provider, label: llmCfg.label, model: llmCfg.model }
+      : null,
     tools_used: Object.keys(toolsUsed),
     citations: (toolsUsed.faq || []).map((f) => f.id)
   };
@@ -295,5 +305,6 @@ module.exports = {
   chat,
   streamChat,
   retrieveFaq,
-  FAQ
+  FAQ,
+  resolveLlmConfig
 };
