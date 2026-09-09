@@ -8,3 +8,4 @@ data/*.db-wal
 *.log
 .vscode/
 .idea/
+docs/
