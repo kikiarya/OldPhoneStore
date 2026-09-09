@@ -7,7 +7,7 @@
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
     "seed": "node server/seed.js",
-    "db:reset": "rm -f data/phones.db && node server/seed.js"
+    "db:reset": "rm -f data/phones.db data/phones.db-wal data/phones.db-shm && node server/seed.js --force"
   },
   "engines": {
     "node": ">=18"
