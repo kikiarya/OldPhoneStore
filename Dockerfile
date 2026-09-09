@@ -15,6 +15,7 @@ COPY . .
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV DATABASE_PATH=/app/data/phones.db
+ENV REDIS_URL=redis://redis:6379
 
 EXPOSE 3000
 

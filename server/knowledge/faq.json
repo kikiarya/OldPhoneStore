@@ -1,0 +1,44 @@
+[
+  {
+    "id": "warranty",
+    "tags": ["warranty", "guarantee", "保修", "质保"],
+    "question": "What warranty do you offer?",
+    "answer": "Every certified phone includes a 90-day store warranty covering hardware defects. Battery health below advertised grade within 14 days qualifies for a free swap."
+  },
+  {
+    "id": "shipping",
+    "tags": ["shipping", "delivery", "物流", "发货"],
+    "question": "How fast is shipping?",
+    "answer": "In-stock devices usually ship within 1 business day via insured courier. Tracking is emailed after dispatch."
+  },
+  {
+    "id": "returns",
+    "tags": ["return", "refund", "退货", "退款"],
+    "question": "Can I return a phone?",
+    "answer": "You can request a return within 7 days if the device is unused and in original packaging. Flash-sale items follow the same window unless marked final sale."
+  },
+  {
+    "id": "condition",
+    "tags": ["condition", "grade", "成色", "验机"],
+    "question": "What do condition grades mean?",
+    "answer": "Like New: minimal to no cosmetic wear. Good: light marks, fully functional. Fair: visible wear, tested OK. All units pass IMEI blacklist and function checks."
+  },
+  {
+    "id": "payment",
+    "tags": ["payment", "pay", "支付", "付款"],
+    "question": "How do I pay?",
+    "answer": "This demo uses pending → paid status transitions (no real gateway). In production you would plug Stripe / WeChat / Alipay webhooks with idempotent callbacks."
+  },
+  {
+    "id": "flash",
+    "tags": ["flash", "seckill", "秒杀", "限时"],
+    "question": "How does flash sale work?",
+    "answer": "Flash deals use Redis + Lua for atomic stock checks and one-deal-per-user. Successful claims are pushed to a Redis Stream and written to SQLite asynchronously."
+  },
+  {
+    "id": "imei",
+    "tags": ["imei", "blacklist", "解锁"],
+    "question": "Are phones unlocked / clean IMEI?",
+    "answer": "Listings show a masked IMEI. Demo inventory is treated as carrier-unlocked and blacklist-checked before listing."
+  }
+]

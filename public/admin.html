@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin — OldPhoneStore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="admin-body">
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">OldPhoneStore Admin</span>
+      </a>
+      <nav class="header-actions">
+        <a class="btn ghost" href="/">Storefront</a>
+        <button type="button" id="admin-logout" class="btn ghost">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <section id="admin-login" class="admin-card">
+      <h1>Admin login</h1>
+      <p class="muted">Demo: admin@oldphonestore.demo / admin123</p>
+      <form id="admin-login-form" class="admin-form">
+        <label class="field">
+          <span class="label">Email</span>
+          <input type="email" id="admin-email" value="admin@oldphonestore.demo" required>
+        </label>
+        <label class="field">
+          <span class="label">Password</span>
+          <input type="password" id="admin-password" value="admin123" required>
+        </label>
+        <button type="submit" class="btn primary">Sign in</button>
+      </form>
+      <p id="admin-login-error" class="danger muted"></p>
+    </section>
+
+    <section id="admin-dash" class="hidden">
+      <h1 class="section-title">Dashboard</h1>
+      <p class="section-sub" id="dash-sub">Loading…</p>
+      <div id="dash-cards" class="dash-cards"></div>
+
+      <h2 class="section-title">Orders</h2>
+      <div class="admin-toolbar">
+        <select id="order-status-filter">
+          <option value="">All statuses</option>
+          <option>pending</option>
+          <option>paid</option>
+          <option>shipped</option>
+          <option>completed</option>
+          <option>cancelled</option>
+        </select>
+        <button type="button" id="refresh-orders" class="btn ghost">Refresh</button>
+        <button type="button" id="timeout-scan" class="btn ghost">Run timeout scan</button>
+      </div>
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Order No</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Source</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="orders-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/js/admin.js" defer></script>
+</body>
+</html>

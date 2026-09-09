@@ -1,28 +1,36 @@
 {
   "name": "oldphonestore",
-  "version": "1.0.0",
-  "description": "OldPhoneStore — certified pre-owned smartphone marketplace",
+  "version": "2.0.0",
+  "description": "OldPhoneStore — pre-owned phone marketplace with Redis seckill, JWT auth, and AI customer service",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
     "seed": "node server/seed.js",
-    "db:reset": "rm -f data/phones.db data/phones.db-wal data/phones.db-shm && node server/seed.js --force"
+    "db:reset": "node server/seed.js --force",
+    "docker:up": "docker compose up --build -d",
+    "docker:down": "docker compose down"
   },
   "engines": {
     "node": ">=18"
   },
   "keywords": [
     "ecommerce",
-    "phones",
-    "marketplace",
-    "sqlite"
+    "redis",
+    "seckill",
+    "jwt",
+    "ai-customer-service",
+    "sqlite",
+    "docker"
   ],
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "better-sqlite3": "^11.8.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "ioredis": "^5.4.2",
+    "jsonwebtoken": "^9.0.2"
   }
 }

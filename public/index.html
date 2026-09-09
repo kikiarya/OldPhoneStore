@@ -20,6 +20,9 @@
         <span class="brand-name">OldPhoneStore</span>
       </a>
       <nav class="header-actions" aria-label="Primary">
+        <a class="btn ghost" href="/admin">Admin</a>
+        <button type="button" id="auth-btn" class="btn ghost">Login</button>
+        <span id="user-chip" class="user-chip hidden"></span>
         <button type="button" id="theme-toggle" class="btn ghost" aria-pressed="false">Dark</button>
         <button type="button" id="cart-open" class="btn cart-btn" aria-controls="cart-drawer" aria-expanded="false">
           Cart <span id="cart-count" class="cart-count">0</span>
@@ -43,6 +46,14 @@
       <div class="hero-phone hero-phone-a"></div>
       <div class="hero-phone hero-phone-b"></div>
     </div>
+  </section>
+
+  <section id="flash" class="flash-section" aria-labelledby="flash-title">
+    <div class="flash-head">
+      <h2 class="section-title" id="flash-title">Flash deals</h2>
+      <p class="section-sub">Redis + Lua 原子扣库存 · 一人一单 · Stream 异步落单（对标黑马点评秒杀）</p>
+    </div>
+    <div id="flash-grid" class="flash-grid"></div>
   </section>
 
   <main id="catalog" class="catalog">
@@ -133,6 +144,45 @@
       <div id="detail-body"></div>
     </form>
   </dialog>
+
+  <dialog id="auth-dialog" class="auth-dialog">
+    <form id="auth-form" class="auth-inner">
+      <h2 id="auth-title">Login</h2>
+      <p class="muted">Demo: buyer@oldphonestore.demo / buyer123</p>
+      <label class="field">
+        <span class="label">Name (register)</span>
+        <input type="text" id="auth-name" placeholder="Optional for login">
+      </label>
+      <label class="field">
+        <span class="label">Email</span>
+        <input type="email" id="auth-email" required value="buyer@oldphonestore.demo">
+      </label>
+      <label class="field">
+        <span class="label">Password</span>
+        <input type="password" id="auth-password" required value="buyer123">
+      </label>
+      <div class="auth-actions">
+        <button type="submit" class="btn primary" id="auth-submit">Login</button>
+        <button type="button" class="btn ghost" id="auth-mode-toggle">Need an account?</button>
+        <button type="button" class="btn ghost" id="auth-cancel" value="cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="chat-widget">
+    <button type="button" id="chat-toggle" class="chat-toggle" aria-expanded="false">客服</button>
+    <div id="chat-panel" class="chat-panel" hidden>
+      <header class="chat-header">
+        <strong>智能客服</strong>
+        <span class="muted">RAG + Tools · SSE</span>
+      </header>
+      <div id="chat-log" class="chat-log" aria-live="polite"></div>
+      <form id="chat-form" class="chat-form">
+        <input type="text" id="chat-input" placeholder="问保修、搜 iPhone、查秒杀…" autocomplete="off" required>
+        <button type="submit" class="btn primary">Send</button>
+      </form>
+    </div>
+  </div>
 
   <script src="/js/app.js" defer></script>
 </body>
