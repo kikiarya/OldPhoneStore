@@ -9,6 +9,14 @@
 
 **Stack:** Express · SQLite · Redis · JWT · Lua / Stream · RAG Chat
 
+| 文档 | 说明 |
+|------|------|
+| [项目讲解](./docs/项目讲解.md) | 每个核心设计的完整口述稿 |
+| [部署指南](./docs/DEPLOY.md) | Railway（推荐）/ Render / 本地 Docker |
+
+<!-- 部署后把下一行改成真实地址 -->
+<!-- **Live Demo:** https://your-app.up.railway.app -->
+
 ---
 
 ## 核心技术点
@@ -28,7 +36,7 @@
 - **FAQ RAG** — 保修 / 物流 / 退货 / 成色等知识库检索
 - **Tool 调用** — 搜手机、查订单、列秒杀活动
 - **多轮记忆** — Redis 保存近期对话上下文
-- **可选大模型** — 通过 OpenAI 兼容接口接入 **OpenAI / DeepSeek / Kimi**（`LLM_PROVIDER` + `LLM_API_KEY`）；未配置时走本地规则引擎，功能仍可完整演示
+- **可选大模型** — OpenAI / DeepSeek / Kimi（`LLM_PROVIDER` + `LLM_API_KEY`）；未配置时本地规则引擎仍可完整演示
 - **流式输出** — 支持 SSE（`stream: true`）
 
 ```mermaid
@@ -58,7 +66,19 @@ docker compose up --build -d
 | Buyer | `buyer@oldphonestore.demo` / `buyer123` |
 | Admin | `admin@oldphonestore.demo` / `admin123` |
 
-本地开发：`cp .env.example .env && npm install && npm start`（建议本机起 Redis，未启动时秒杀自动降级 SQLite）。
+本地开发：`cp .env.example .env && npm install && npm start`（建议本机起 Redis；未启动时秒杀自动降级 SQLite）。
+
+云端部署（推荐 Railway）：见 [docs/DEPLOY.md](./docs/DEPLOY.md)。
+
+---
+
+## 推荐演示路径
+
+1. `GET /api/health` → 确认 `redis: true`、功能列表  
+2. 连续打开同一商品详情 → 看响应头 `X-Cache-Source`  
+3. Buyer 登录 → Flash **Seckill** → 再抢同一场应失败（一人一单）  
+4. 客服：「保修多久」「推荐 iPhone」「有哪些秒杀」  
+5. Admin 看仪表盘、改订单状态  
 
 ---
 
@@ -67,7 +87,7 @@ docker compose up --build -d
 - **Catalog** — 搜索 / 品牌 / 成色筛选，详情接口带 `X-Cache-Source`
 - **Cart checkout** — 事务扣库存 + 幂等下单
 - **Flash deals** — 首页秒杀区，登录后抢购
-- **Chat widget** — 智能客服；可接 OpenAI / DeepSeek / Kimi，或纯本地 RAG+Tools
+- **Chat widget** — 智能客服；可接 OpenAI / DeepSeek / Kimi
 - **Admin** — 营收 / 库存 / 订单状态 / 超时扫描
 
 ---
@@ -99,11 +119,13 @@ curl -s -X POST localhost:3000/api/flash/1/buy -H "Authorization: Bearer $TOKEN"
 server/
   lua/seckill.lua          # 秒杀原子脚本
   services/cacheService.js # 缓存穿透 / 击穿 / 雪崩
+  services/llmConfig.js    # OpenAI / DeepSeek / Kimi
   services/seckillService.js
   services/orderWorker.js  # Stream 消费 + 超时关单
   services/chatService.js  # RAG + Tools
-  routes/                  # auth · phones · orders · flash · admin · chat
+  routes/
 public/                    # 商城 + /admin
+docs/                      # 讲解 + 部署
 docker-compose.yml         # web + redis
 ```
 
