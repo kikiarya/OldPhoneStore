@@ -160,7 +160,7 @@ router.post('/:id/pay', authOptional, (req, res) => {
     return res.status(409).json({ error: `Cannot pay order in status ${order.status}` });
   }
 
-  // Conditional update = payment callback idempotency pattern (苍穹外卖)
+  // Conditional update — payment callback idempotency
   const r = db
     .prepare(
       `UPDATE orders SET status = 'paid', updated_at = datetime('now')

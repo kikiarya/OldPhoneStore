@@ -1,4 +1,4 @@
--- Atomic flash-sale qualification (黑马点评-style Redis + Lua)
+-- Atomic flash-sale: stock check, one-per-user, enqueue order
 -- KEYS[1] = stock key
 -- KEYS[2] = buyers set key
 -- KEYS[3] = stream key
