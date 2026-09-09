@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OldPhoneStore — Certified Pre-Owned Phones</title>
   <meta name="description" content="Shop certified refurbished smartphones. Inspected, warranted, ready to ship.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
@@ -16,48 +13,48 @@
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="/" aria-label="OldPhoneStore home">
-        <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-name">OldPhoneStore</span>
       </a>
-      <nav class="header-actions" aria-label="Primary">
-        <a class="btn ghost" href="/admin">Admin</a>
-        <button type="button" id="auth-btn" class="btn ghost">Login</button>
-        <span id="user-chip" class="user-chip hidden"></span>
-        <button type="button" id="theme-toggle" class="btn ghost" aria-pressed="false">Dark</button>
-        <button type="button" id="cart-open" class="btn cart-btn" aria-controls="cart-drawer" aria-expanded="false">
-          Cart <span id="cart-count" class="cart-count">0</span>
-        </button>
+      <nav class="header-nav" aria-label="Primary">
+        <a href="#flash">Deals</a>
+        <a href="#catalog">Phones</a>
+        <a href="#how-it-works">Process</a>
+        <a href="/admin">Admin</a>
       </nav>
+      <div class="header-actions">
+        <button type="button" id="auth-btn" class="text-btn">Login</button>
+        <span id="user-chip" class="user-chip hidden"></span>
+        <button type="button" id="theme-toggle" class="text-btn" aria-pressed="false">Dark</button>
+        <button type="button" id="cart-open" class="text-btn cart-btn" aria-controls="cart-drawer" aria-expanded="false">
+          Bag <span id="cart-count" class="cart-count">0</span>
+        </button>
+      </div>
     </div>
   </header>
 
   <section class="hero" aria-labelledby="hero-brand">
-    <div class="hero-atmosphere" aria-hidden="true"></div>
-    <div class="hero-content">
-      <p class="hero-brand" id="hero-brand">OldPhoneStore</p>
-      <h1 class="hero-headline">Phones worth keeping — prices worth switching for.</h1>
-      <p class="hero-sub">Every device is inspected, graded, and backed by a 90-day warranty.</p>
+    <div class="hero-inner">
+      <p class="hero-eyebrow">Certified pre-owned</p>
+      <h1 class="hero-brand" id="hero-brand">OldPhoneStore</h1>
+      <p class="hero-headline">Phones worth keeping.</p>
+      <p class="hero-sub">Inspected. Graded. Backed by a 90-day warranty.</p>
       <div class="hero-cta">
-        <a class="btn primary" href="#catalog">Browse inventory</a>
-        <a class="btn ghost" href="#how-it-works">How it works</a>
+        <a class="link-cta" href="#catalog">Browse inventory <span aria-hidden="true">›</span></a>
+        <a class="link-cta muted-link" href="#flash">Flash deals <span aria-hidden="true">›</span></a>
       </div>
     </div>
-    <div class="hero-visual" aria-hidden="true">
-      <div class="hero-phone hero-phone-a"></div>
-      <div class="hero-phone hero-phone-b"></div>
-    </div>
   </section>
 
-  <section id="flash" class="flash-section" aria-labelledby="flash-title">
-    <div class="flash-head">
+  <section id="flash" class="flash-section band" aria-labelledby="flash-title">
+    <div class="section-inner">
       <h2 class="section-title" id="flash-title">Flash deals</h2>
-      <p class="section-sub">Redis + Lua 原子扣库存 · 一人一单 · Stream 异步落单</p>
+      <p class="section-sub">Limited stock. One claim per account.</p>
+      <div id="flash-grid" class="flash-grid"></div>
     </div>
-    <div id="flash-grid" class="flash-grid"></div>
   </section>
 
-  <main id="catalog" class="catalog">
-    <div class="catalog-toolbar">
+  <main id="catalog" class="catalog band band-alt">
+    <div class="section-inner">
       <h2 class="section-title">Live inventory</h2>
       <p class="section-sub" id="inventory-stats">Loading stock…</p>
 
@@ -91,35 +88,48 @@
           <button type="button" id="reset-filters" class="btn ghost">Reset</button>
         </div>
       </form>
-    </div>
 
-    <div id="phone-grid" class="phone-grid" aria-live="polite"></div>
-    <p id="empty-state" class="empty-state hidden">No phones match those filters. Try another search.</p>
+      <div id="phone-grid" class="phone-grid" aria-live="polite"></div>
+      <p id="empty-state" class="empty-state hidden">No phones match those filters. Try another search.</p>
+    </div>
   </main>
 
-  <section id="how-it-works" class="how">
-    <h2 class="section-title">How it works</h2>
-    <p class="section-sub">Three steps from listing to your pocket.</p>
-    <ol class="how-steps">
-      <li><strong>We inspect</strong> — battery, IMEI blacklist, cameras, and ports.</li>
-      <li><strong>You choose</strong> — grade, storage, and price that fit.</li>
-      <li><strong>We ship</strong> — insured delivery with a 90-day warranty.</li>
-    </ol>
+  <section id="how-it-works" class="how band">
+    <div class="section-inner">
+      <h2 class="section-title">How it works</h2>
+      <p class="section-sub">From inspection to your door.</p>
+      <ol class="how-steps">
+        <li>
+          <strong>Inspect</strong>
+          <p>Battery, IMEI, cameras, and ports — graded before listing.</p>
+        </li>
+        <li>
+          <strong>Choose</strong>
+          <p>Pick the grade, storage, and price that fit.</p>
+        </li>
+        <li>
+          <strong>Ship</strong>
+          <p>Insured delivery with a 90-day warranty.</p>
+        </li>
+      </ol>
+    </div>
   </section>
 
   <footer class="site-footer">
-    <p><strong>OldPhoneStore</strong> — certified pre-owned smartphones.</p>
-    <p class="muted">API health: <span id="api-status">checking…</span></p>
+    <div class="section-inner footer-inner">
+      <p><strong>OldPhoneStore</strong> — certified pre-owned smartphones.</p>
+      <p class="muted">API: <span id="api-status">checking…</span></p>
+    </div>
   </footer>
 
   <aside id="cart-drawer" class="cart-drawer" aria-hidden="true" aria-labelledby="cart-title">
     <div class="cart-panel">
       <header class="cart-header">
-        <h2 id="cart-title">Your cart</h2>
-        <button type="button" id="cart-close" class="btn ghost" aria-label="Close cart">Close</button>
+        <h2 id="cart-title">Bag</h2>
+        <button type="button" id="cart-close" class="text-btn" aria-label="Close cart">Close</button>
       </header>
       <ul id="cart-items" class="cart-items"></ul>
-      <p id="cart-empty" class="muted">Cart is empty. Add a phone from the catalog.</p>
+      <p id="cart-empty" class="muted">Your bag is empty.</p>
       <div class="cart-footer">
         <p class="cart-total">Total <strong id="cart-total">$0.00</strong></p>
         <label class="field">
@@ -131,7 +141,7 @@
           <input type="email" id="checkout-email" placeholder="you@example.com">
         </label>
         <button type="button" id="checkout-btn" class="btn primary" disabled>Place order</button>
-        <button type="button" id="clear-cart" class="btn ghost">Clear cart</button>
+        <button type="button" id="clear-cart" class="btn ghost">Clear bag</button>
       </div>
     </div>
   </aside>
@@ -140,14 +150,14 @@
 
   <dialog id="detail-dialog" class="detail-dialog">
     <form method="dialog" class="detail-inner">
-      <button type="submit" class="btn ghost detail-close" value="close">Close</button>
+      <button type="submit" class="text-btn detail-close" value="close">Close</button>
       <div id="detail-body"></div>
     </form>
   </dialog>
 
   <dialog id="auth-dialog" class="auth-dialog">
     <form id="auth-form" class="auth-inner">
-      <h2 id="auth-title">Login</h2>
+      <h2 id="auth-title">Sign in</h2>
       <p class="muted">Demo: buyer@oldphonestore.demo / buyer123</p>
       <label class="field">
         <span class="label">Name (register)</span>
@@ -162,23 +172,23 @@
         <input type="password" id="auth-password" required value="buyer123">
       </label>
       <div class="auth-actions">
-        <button type="submit" class="btn primary" id="auth-submit">Login</button>
-        <button type="button" class="btn ghost" id="auth-mode-toggle">Need an account?</button>
-        <button type="button" class="btn ghost" id="auth-cancel" value="cancel">Cancel</button>
+        <button type="submit" class="btn primary" id="auth-submit">Sign in</button>
+        <button type="button" class="text-btn" id="auth-mode-toggle">Create account</button>
+        <button type="button" class="text-btn" id="auth-cancel" value="cancel">Cancel</button>
       </div>
     </form>
   </dialog>
 
   <div class="chat-widget">
-    <button type="button" id="chat-toggle" class="chat-toggle" aria-expanded="false">客服</button>
+    <button type="button" id="chat-toggle" class="chat-toggle" aria-expanded="false">Support</button>
     <div id="chat-panel" class="chat-panel" hidden>
       <header class="chat-header">
-        <strong>智能客服</strong>
-        <span class="muted">RAG + Tools · SSE</span>
+        <strong>Support</strong>
+        <p class="muted chat-tagline">Warranty · Search · Orders · Deals</p>
       </header>
       <div id="chat-log" class="chat-log" aria-live="polite"></div>
       <form id="chat-form" class="chat-form">
-        <input type="text" id="chat-input" placeholder="问保修、搜 iPhone、查秒杀…" autocomplete="off" required>
+        <input type="text" id="chat-input" placeholder="Ask about warranty, iPhone, deals…" autocomplete="off" required>
         <button type="submit" class="btn primary">Send</button>
       </form>
     </div>

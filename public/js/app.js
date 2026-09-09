@@ -150,7 +150,7 @@
 
   function initTheme() {
     const saved = localStorage.getItem(THEME_KEY);
-    applyTheme(saved === 'light' || saved === 'dark' ? saved : 'dark');
+    applyTheme(saved === 'light' || saved === 'dark' ? saved : 'light');
   }
 
   function fillSelect(select, values, allLabel) {

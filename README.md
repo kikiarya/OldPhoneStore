@@ -2,6 +2,7 @@
 
 二手手机商城全栈项目 · Docker 一键启动 · Redis 高并发 · 智能客服
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-onrender-blue?logo=render)](https://oldphonestore.onrender.com/)
 ![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 ![Redis](https://img.shields.io/badge/redis-7-red)
 ![Docker](https://img.shields.io/badge/docker--compose-ready-blue)
@@ -9,15 +10,13 @@
 
 **Stack:** Express · SQLite · Redis · JWT · Lua / Stream · RAG Chat
 
+**Live Demo:** https://oldphonestore.onrender.com/  
+（Render Free 可能休眠，首次打开需等待冷启动）
+
 | 文档 | 说明 |
 |------|------|
 | [项目讲解](./docs/项目讲解.md) | 每个核心设计的完整口述稿 |
-| [部署指南](./docs/DEPLOY.md) | **Render Free（$0，可休眠）** / 本地 Docker / Railway 试用 |
-
-<!-- 部署后把下一行改成真实地址 -->
-<!-- **Live Demo:** https://oldphonestore.onrender.com -->
-
----
+| [部署指南](./docs/DEPLOY.md) | Render Free / 本地 Docker |
 
 ## 核心技术点
 
