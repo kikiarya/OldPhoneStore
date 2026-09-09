@@ -12,10 +12,10 @@
 | 文档 | 说明 |
 |------|------|
 | [项目讲解](./docs/项目讲解.md) | 每个核心设计的完整口述稿 |
-| [部署指南](./docs/DEPLOY.md) | Railway（推荐）/ Render / 本地 Docker |
+| [部署指南](./docs/DEPLOY.md) | **Render Free（$0，可休眠）** / 本地 Docker / Railway 试用 |
 
 <!-- 部署后把下一行改成真实地址 -->
-<!-- **Live Demo:** https://your-app.up.railway.app -->
+<!-- **Live Demo:** https://oldphonestore.onrender.com -->
 
 ---
 
@@ -68,7 +68,7 @@ docker compose up --build -d
 
 本地开发：`cp .env.example .env && npm install && npm start`（建议本机起 Redis；未启动时秒杀自动降级 SQLite）。
 
-云端部署（推荐 Railway）：见 [docs/DEPLOY.md](./docs/DEPLOY.md)。
+云端部署（**Render Free / $0**，可休眠）：见 [docs/DEPLOY.md](./docs/DEPLOY.md)。
 
 ---
 

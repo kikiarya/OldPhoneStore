@@ -1,119 +1,144 @@
 # 部署指南
 
-本项目是 **常驻 Node 进程 + Redis + SQLite 文件**，不适合 Vercel / Netlify 纯 Serverless。
+本项目是 **常驻 Node + Redis + SQLite**，不适合 Vercel / Netlify Serverless。
 
-## 选哪个平台？
+## 怎么选？
 
-| | Railway（推荐） | Render |
-|--|-----------------|--------|
-| 上手难度 | 更简单：同项目加 Redis，变量可一键引用 | 要分别建 Web + Redis，自己填连接串 |
-| 免费情况 | 试用额度 / Hobby 含月度 credit，策略会变 | Free Web 会**休眠**，冷启动几十秒 |
-| 对本仓库 | Node + Redis 同项目最省事 | 能跑，展示体验一般（休眠） |
+| 需求 | 平台 |
+|------|------|
+| **$0 + 接受休眠（Demo 够用）** | **Render Free** ← 推荐你现在用这个 |
+| 试用期内要更稳、更好配 Redis | Railway 试用（约 30 天 / $5，到期要升级） |
+| 完全离线 | 本机 `docker compose up --build -d` |
 
-**结论：想尽快挂上公网链接 → 用 Railway。**  
-只想 $0、能接受首访很慢 → 可试 Render Free。
+休眠是什么：Free Web 闲置一段时间后会睡；下次访问可能 **30～60 秒** 才醒。作品集 Demo 完全可以接受——打开前自己先点一次热机即可。
 
 ---
 
-## Railway（推荐，约 10 分钟）
+## Render Free（$0，推荐）
 
-### 1. 准备
+### 总览
 
-1. 代码已在 GitHub：`main` 分支最新  
-2. 打开 [railway.app](https://railway.app) → Login with GitHub  
+你需要建 **两个服务**：
 
-### 2. 部署 Web
+1. **Web Service** — 跑本仓库 Node 应用  
+2. **Key Value（Redis）** — 给缓存 / 秒杀 / 客服记忆用  
 
-1. **New Project** → **Deploy from GitHub repo** → 选 `OldPhoneStore`  
-2. Railway 会识别 Node（已有 `package.json` + `Procfile`）  
-3. Settings → 确认 Start Command 为 `npm start`（或留空让其用 Procfile：`web: node server/index.js`）  
+再给 Web 挂一块 **Disk**，否则 SQLite 重启会丢数据。
 
-### 3. 添加 Redis
+### 1. 登录
 
-1. 项目里 **Add Service** → **Database** → **Redis**  
-2. 打开 Web 服务 → **Variables** → **Add Variable**  
-3. 名称：`REDIS_URL`  
-4. 值：点右侧引用 Redis 的 **`REDIS_URL`**（或 `Connection URL`）变量，不要手抄错  
+打开 [https://render.com](https://render.com) → 用 GitHub 登录 → 授权仓库 `OldPhoneStore`。
 
-### 4. 其它环境变量
+### 2. 先建 Redis（Key Value）
 
-在 Web 服务 Variables 里再加：
+1. **Dashboard** → **New +** → **Key Value**（有的界面叫 Redis）  
+2. Name：`oldphonestore-redis`  
+3. Plan：**Free**  
+4. Create  
+
+创建后打开这个服务，复制 **Internal Redis URL**（一般形如 `redis://...`）。  
+后面填到 Web 的 `REDIS_URL`。
+
+> 若只有 External URL，Demo 也可用；同一账号内优先用 Internal。
+
+### 3. 再建 Web Service
+
+1. **New +** → **Web Service**  
+2. 连 GitHub → 选 `kikiarya/OldPhoneStore`  
+3. 大致填：
+
+| 项 | 值 |
+|----|-----|
+| Name | `oldphonestore` |
+| Region | 任选（离你近即可） |
+| Branch | `main` |
+| Runtime | **Node** |
+| Build Command | `npm install` |
+| Start Command | `npm start` |
+| Instance Type | **Free** |
+
+### 4. 环境变量（Web → Environment）
 
 | Key | Value |
 |-----|--------|
 | `NODE_ENV` | `production` |
-| `JWT_SECRET` | 随机长字符串（不要用仓库默认值） |
+| `PORT` | `10000`（Render 常注入 `PORT`，一般不用改；若要求手填用面板给的） |
+| `REDIS_URL` | 粘贴上一步 Redis 的 URL |
+| `JWT_SECRET` | 自己生成一串随机字符 |
 | `DATABASE_PATH` | `/data/phones.db` |
 | `ORDER_TIMEOUT_MINUTES` | `15` |
 
-可选 LLM（不配也能用本地客服）：
+LLM **可以不配**（本地 RAG 客服照样能演示）。若要接 DeepSeek：
 
 ```
 LLM_PROVIDER=deepseek
-LLM_API_KEY=sk-...
+LLM_API_KEY=sk-你的key
 ```
 
-或 `kimi` / `openai`。
+### 5. 磁盘 Disk（SQLite 持久化）
 
-### 5. 持久化 SQLite（重要）
+Web → **Disks** → **Add Disk**：
 
-默认磁盘是临时的，**redeploy 可能丢库**。作品集建议挂 Volume：
+| 项 | 值 |
+|----|-----|
+| Name | `phone-data` |
+| Mount Path | `/data` |
+| Size | Free 允许的最小值即可（如 1 GB） |
 
-1. Web 服务 → **Settings** → **Volumes**（或 Mount）  
-2. Mount Path：`/data`  
-3. 确保 `DATABASE_PATH=/data/phones.db`  
+确保 `DATABASE_PATH=/data/phones.db`（挂在 `/data` 下）。
 
-首次启动会自动建表并 seed Demo 账号。
+### 6. 部署与域名
 
-### 6. 生成公网域名
+点 **Create Web Service** / **Deploy**。  
+完成后 Render 会给公网地址，例如：
 
-Web 服务 → **Settings** → **Networking** → **Generate Domain**  
-
-得到类似：`https://oldphonestore-xxxx.up.railway.app`
+`https://oldphonestore.onrender.com`
 
 自检：
 
-```text
-https://你的域名/api/health
-```
+1. 打开 `https://你的域名/api/health`  
+2. 看 `"redis": true`（若为 false，检查 `REDIS_URL`）  
+3. 打开首页、`/admin`  
+4. Demo 账号见 README  
 
-应看到 `"redis": true`。然后打开首页与 `/admin`。
+### 7. 演示前热机
 
-### 7. 回填 README
+分享链接前自己先访问一次首页；若在睡觉，等它醒过来再给面试官点。
 
-把 README 里 Live Demo 注释改成真实链接并 push。
+### 8. 写进 README
 
----
-
-## Render（备选）
-
-1. [render.com](https://render.com) → New **Web Service** → 连 GitHub 仓库  
-2. Runtime：Node；Build：`npm install`；Start：`npm start`  
-3. 另建 **Key Value（Redis）**，把 Internal Redis URL 填到 Web 的 `REDIS_URL`  
-4. Web 加 **Disk**，挂载 `/data`，`DATABASE_PATH=/data/phones.db`  
-5. 同样设置 `JWT_SECRET`、`NODE_ENV=production`  
-
-注意：Free Web **闲置会睡**，作品集演示前先访问一次热机。
+把 Live Demo 链接贴到 README 顶部（去掉注释），再 `git push`。
 
 ---
 
-## 本地 Docker（零云费用）
+## 免费方案注意点
+
+- Free Web：**会休眠**；不是 7×24 稳定站。  
+- Free Redis / Disk：额度以 Render 当前政策为准，可能调整。  
+- 不要把真实支付密钥、生产用户数据放这套 Free Demo 上。  
+- `JWT_SECRET` 不要用仓库里的默认字符串。
+
+---
+
+## 本地 Docker（零云费用、功能最全）
 
 ```bash
 docker compose up --build -d
 # http://localhost:3000
 ```
 
-已包含 `web` + `redis` + 数据卷，和线上能力最接近。
+---
+
+## Railway 试用（可选）
+
+适合想「少配一点、试用期内更稳」的情况；到期会出现 *30 days or $5 / Upgrade to keep online*。  
+步骤见旧版思路：GitHub 部署 + 加 Redis + Volume `/data`。要长期挂着需付费，**纯 Demo 优先 Render Free**。
 
 ---
 
-## 部署后检查清单
+## 检查清单
 
 - [ ] `/api/health` → `redis: true`  
-- [ ] Buyer 登录能秒杀  
-- [ ] 客服能回答「保修」  
-- [ ] `/admin` 能进仪表盘  
-- [ ] README 放上 Live Demo 链接  
-
-费用与套餐以官网当前说明为准；作品集低频访问通常消耗很小。
+- [ ] 能登录 Buyer / Admin  
+- [ ] 秒杀、客服、管理端能点  
+- [ ] README 已放 Live Demo 链接  
