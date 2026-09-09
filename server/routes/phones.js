@@ -1,5 +1,6 @@
 const express = require('express');
 const { getDb } = require('../db');
+const { cacheAside, cacheDel } = require('../services/cacheService');
 
 const router = express.Router();
 
@@ -84,43 +85,71 @@ router.get('/', (req, res) => {
   res.json({ count: rows.length, phones: rows.map(rowToPhone) });
 });
 
-/** GET /api/phones/meta — filter options */
-router.get('/meta', (_req, res) => {
-  const db = getDb();
-  const categories = db
-    .prepare('SELECT DISTINCT category FROM phones ORDER BY category')
-    .all()
-    .map((r) => r.category);
-  const brands = db
-    .prepare('SELECT DISTINCT brand FROM phones ORDER BY brand')
-    .all()
-    .map((r) => r.brand);
-  const conditions = db
-    .prepare('SELECT DISTINCT condition FROM phones ORDER BY condition')
-    .all()
-    .map((r) => r.condition);
-  const stats = db
-    .prepare(
-      `SELECT
-        COUNT(*) AS total,
-        SUM(CASE WHEN available = 1 THEN 1 ELSE 0 END) AS in_stock,
-        MIN(price) AS min_price,
-        MAX(price) AS max_price
-       FROM phones`
-    )
-    .get();
+/** GET /api/phones/meta — filter options (Redis cached) */
+router.get('/meta', async (_req, res) => {
+  const { data, source } = await cacheAside(
+    'phones:meta',
+    () => {
+      const db = getDb();
+      const categories = db
+        .prepare('SELECT DISTINCT category FROM phones ORDER BY category')
+        .all()
+        .map((r) => r.category);
+      const brands = db
+        .prepare('SELECT DISTINCT brand FROM phones ORDER BY brand')
+        .all()
+        .map((r) => r.brand);
+      const conditions = db
+        .prepare('SELECT DISTINCT condition FROM phones ORDER BY condition')
+        .all()
+        .map((r) => r.condition);
+      const stats = db
+        .prepare(
+          `SELECT
+            COUNT(*) AS total,
+            SUM(CASE WHEN available = 1 THEN 1 ELSE 0 END) AS in_stock,
+            MIN(price) AS min_price,
+            MAX(price) AS max_price
+           FROM phones`
+        )
+        .get();
+      return { categories, brands, conditions, stats };
+    },
+    { ttlSec: 120 }
+  );
 
-  res.json({ categories, brands, conditions, stats });
+  res.setHeader('X-Cache-Source', source);
+  res.json(data);
 });
 
-/** GET /api/phones/:id */
-router.get('/:id', (req, res) => {
-  const db = getDb();
-  const row = db.prepare('SELECT * FROM phones WHERE id = ?').get(Number(req.params.id));
-  if (!row) {
-    return res.status(404).json({ error: 'Phone not found' });
+/** GET /api/phones/:id — detail with cache aside + null cache + mutex */
+router.get('/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ error: 'Invalid id' });
   }
-  res.json(rowToPhone(row));
+
+  const { data, source } = await cacheAside(
+    `phone:${id}`,
+    () => {
+      const row = getDb().prepare('SELECT * FROM phones WHERE id = ?').get(id);
+      return rowToPhone(row);
+    },
+    { ttlSec: 300 }
+  );
+
+  res.setHeader('X-Cache-Source', source);
+  if (!data) {
+    return res.status(404).json({ error: 'Phone not found', cached_null: source.startsWith('redis') });
+  }
+  res.json(data);
 });
+
+/** Internal helper used by admin after mutations */
+async function invalidatePhoneCaches(id) {
+  await cacheDel(`phone:${id}`, 'phones:meta');
+}
 
 module.exports = router;
+module.exports.invalidatePhoneCaches = invalidatePhoneCaches;
+module.exports.rowToPhone = rowToPhone;

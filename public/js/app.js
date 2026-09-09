@@ -1,6 +1,9 @@
 (() => {
   const CART_KEY = 'oldphonestore_cart';
   const THEME_KEY = 'oldphonestore_theme';
+  const TOKEN_KEY = 'oldphonestore_token';
+  const USER_KEY = 'oldphonestore_user';
+  const CHAT_SESSION_KEY = 'oldphonestore_chat_session';
 
   const els = {
     grid: document.getElementById('phone-grid'),
@@ -27,11 +30,36 @@
     toast: document.getElementById('toast'),
     apiStatus: document.getElementById('api-status'),
     detailDialog: document.getElementById('detail-dialog'),
-    detailBody: document.getElementById('detail-body')
+    detailBody: document.getElementById('detail-body'),
+    flashGrid: document.getElementById('flash-grid'),
+    authBtn: document.getElementById('auth-btn'),
+    userChip: document.getElementById('user-chip'),
+    authDialog: document.getElementById('auth-dialog'),
+    authForm: document.getElementById('auth-form'),
+    authTitle: document.getElementById('auth-title'),
+    authName: document.getElementById('auth-name'),
+    authEmail: document.getElementById('auth-email'),
+    authPassword: document.getElementById('auth-password'),
+    authSubmit: document.getElementById('auth-submit'),
+    authModeToggle: document.getElementById('auth-mode-toggle'),
+    authCancel: document.getElementById('auth-cancel'),
+    chatToggle: document.getElementById('chat-toggle'),
+    chatPanel: document.getElementById('chat-panel'),
+    chatLog: document.getElementById('chat-log'),
+    chatForm: document.getElementById('chat-form'),
+    chatInput: document.getElementById('chat-input')
   };
 
   let phonesCache = [];
   let cart = loadCart();
+  let authMode = 'login';
+  let token = localStorage.getItem(TOKEN_KEY) || '';
+  let user = null;
+  try {
+    user = JSON.parse(localStorage.getItem(USER_KEY) || 'null');
+  } catch {
+    user = null;
+  }
 
   function loadCart() {
     try {
@@ -72,19 +100,45 @@
     els.toast.textContent = message;
     els.toast.classList.add('show');
     clearTimeout(toast._t);
-    toast._t = setTimeout(() => els.toast.classList.remove('show'), 2600);
+    toast._t = setTimeout(() => els.toast.classList.remove('show'), 2800);
   }
 
-  async function api(path, options) {
-    const res = await fetch(path, {
-      headers: { 'Content-Type': 'application/json' },
-      ...options
-    });
+  async function api(path, options = {}) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    const res = await fetch(path, { ...options, headers });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       throw new Error(data.error || `Request failed (${res.status})`);
     }
     return data;
+  }
+
+  function setAuth(nextToken, nextUser) {
+    token = nextToken || '';
+    user = nextUser || null;
+    if (token) localStorage.setItem(TOKEN_KEY, token);
+    else localStorage.removeItem(TOKEN_KEY);
+    if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
+    else localStorage.removeItem(USER_KEY);
+    renderAuth();
+  }
+
+  function renderAuth() {
+    if (user) {
+      els.authBtn.textContent = 'Logout';
+      els.userChip.textContent = `${user.name} · ${user.role}`;
+      els.userChip.classList.remove('hidden');
+      if (!els.checkoutName.value) els.checkoutName.value = user.name || '';
+      if (!els.checkoutEmail.value) els.checkoutEmail.value = user.email || '';
+    } else {
+      els.authBtn.textContent = 'Login';
+      els.userChip.classList.add('hidden');
+      els.userChip.textContent = '';
+    }
   }
 
   function applyTheme(theme) {
@@ -96,11 +150,7 @@
 
   function initTheme() {
     const saved = localStorage.getItem(THEME_KEY);
-    if (saved === 'light' || saved === 'dark') {
-      applyTheme(saved);
-      return;
-    }
-    applyTheme('dark');
+    applyTheme(saved === 'light' || saved === 'dark' ? saved : 'dark');
   }
 
   function fillSelect(select, values, allLabel) {
@@ -182,7 +232,6 @@
     const meta = await api('/api/phones/meta');
     fillSelect(els.category, meta.categories, 'All brands');
     fillSelect(els.condition, meta.conditions, 'Any');
-    // Also allow filtering sold-out via category sentinel used by API
     const soldOpt = document.createElement('option');
     soldOpt.value = 'unavailable';
     soldOpt.textContent = 'Sold / unavailable';
@@ -207,6 +256,38 @@
     const data = await api(`/api/phones?${params.toString()}`);
     renderPhones(data.phones);
     highlightMatches(q);
+  }
+
+  async function loadFlash() {
+    if (!els.flashGrid) return;
+    const data = await api('/api/flash');
+    els.flashGrid.innerHTML = '';
+    if (!data.deals?.length) {
+      els.flashGrid.innerHTML = '<p class="muted">No active flash deals.</p>';
+      return;
+    }
+    for (const deal of data.deals) {
+      const card = document.createElement('article');
+      card.className = 'flash-card';
+      const pct = deal.stock ? Math.min(100, Math.round((deal.sold / deal.stock) * 100)) : 100;
+      card.innerHTML = `
+        <div class="flash-card-top">
+          <h3>${escapeHtml(deal.title)}</h3>
+          <p class="muted">${escapeHtml(deal.subtitle || '')}</p>
+        </div>
+        <p class="flash-price">
+          <span class="price">${formatPrice(deal.price)}</span>
+          <span class="muted strike">${formatPrice(deal.original_price)}</span>
+        </p>
+        <p class="muted">${deal.brand ? `${escapeHtml(deal.brand)} ${escapeHtml(deal.model || '')}` : 'Bundle deal'}</p>
+        <div class="flash-bar" aria-hidden="true"><span style="width:${pct}%"></span></div>
+        <p class="muted">剩余 ${deal.remaining}/${deal.stock} · Redis ${data.redis ? 'ON' : 'fallback'}</p>
+        <button type="button" class="btn primary" data-flash-buy="${deal.id}" ${deal.remaining > 0 && deal.active_window ? '' : 'disabled'}>
+          ${deal.remaining > 0 ? 'Seckill' : 'Sold out'}
+        </button>
+      `;
+      els.flashGrid.appendChild(card);
+    }
   }
 
   function findPhone(id) {
@@ -312,8 +393,10 @@
     if (!cart.length) return;
     try {
       els.checkoutBtn.disabled = true;
+      const idem = crypto.randomUUID();
       const result = await api('/api/orders', {
         method: 'POST',
+        headers: { 'Idempotency-Key': idem },
         body: JSON.stringify({
           customer_name: els.checkoutName.value.trim() || undefined,
           customer_email: els.checkoutEmail.value.trim() || undefined,
@@ -326,7 +409,7 @@
       cart = [];
       saveCart();
       closeCart();
-      toast(`Order #${result.order_id} placed · ${formatPrice(result.total)}`);
+      toast(`Order ${result.order_no || '#' + result.order_id} · ${formatPrice(result.total)} · pending`);
       await loadMeta();
       await loadPhones();
     } catch (err) {
@@ -338,16 +421,125 @@
   async function checkHealth() {
     try {
       const health = await api('/api/health');
-      els.apiStatus.textContent = `ok · ${health.phones} phones in SQLite`;
+      els.apiStatus.textContent = `ok · ${health.phones} phones · Redis ${health.redis ? 'ON' : 'OFF'}`;
     } catch {
-      els.apiStatus.textContent = 'unreachable — start the server with npm start';
+      els.apiStatus.textContent = 'unreachable — start with npm start or docker compose up';
     }
+  }
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    els.authTitle.textContent = mode === 'login' ? 'Login' : 'Register';
+    els.authSubmit.textContent = mode === 'login' ? 'Login' : 'Create account';
+    els.authModeToggle.textContent = mode === 'login' ? 'Need an account?' : 'Have an account?';
+  }
+
+  function appendChat(role, text) {
+    const div = document.createElement('div');
+    div.className = `chat-bubble ${role}`;
+    div.textContent = text;
+    els.chatLog.appendChild(div);
+    els.chatLog.scrollTop = els.chatLog.scrollHeight;
+  }
+
+  async function sendChat(message) {
+    appendChat('user', message);
+    const thinking = document.createElement('div');
+    thinking.className = 'chat-bubble assistant';
+    thinking.textContent = '…';
+    els.chatLog.appendChild(thinking);
+
+    const session_id = localStorage.getItem(CHAT_SESSION_KEY) || undefined;
+    const result = await api('/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message, session_id, stream: false })
+    });
+    if (result.session_id) localStorage.setItem(CHAT_SESSION_KEY, result.session_id);
+    thinking.textContent = result.reply;
+    thinking.title = `mode=${result.mode} intent=${result.intent}`;
+    els.chatLog.scrollTop = els.chatLog.scrollHeight;
   }
 
   // Events
   els.themeToggle.addEventListener('click', () => {
     const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
     applyTheme(next);
+  });
+
+  els.authBtn.addEventListener('click', async () => {
+    if (user) {
+      try {
+        await api('/api/auth/logout', { method: 'POST' });
+      } catch {
+        /* ignore */
+      }
+      setAuth('', null);
+      toast('Logged out');
+      return;
+    }
+    setAuthMode('login');
+    els.authDialog.showModal();
+  });
+
+  els.authModeToggle.addEventListener('click', () => {
+    setAuthMode(authMode === 'login' ? 'register' : 'login');
+  });
+
+  els.authCancel.addEventListener('click', () => els.authDialog.close());
+
+  els.authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      const body = {
+        email: els.authEmail.value.trim(),
+        password: els.authPassword.value,
+        name: els.authName.value.trim() || 'Buyer'
+      };
+      const path = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
+      const data = await api(path, { method: 'POST', body: JSON.stringify(body) });
+      setAuth(data.token, data.user);
+      els.authDialog.close();
+      toast(`Welcome, ${data.user.name}`);
+    } catch (err) {
+      toast(err.message);
+    }
+  });
+
+  els.flashGrid?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-flash-buy]');
+    if (!btn) return;
+    if (!user) {
+      toast('Login required for seckill');
+      els.authDialog.showModal();
+      return;
+    }
+    try {
+      btn.disabled = true;
+      const dealId = btn.getAttribute('data-flash-buy');
+      const result = await api(`/api/flash/${dealId}/buy`, { method: 'POST' });
+      toast(`${result.message} · ${result.order_no}`);
+      await loadFlash();
+    } catch (err) {
+      toast(err.message);
+      btn.disabled = false;
+    }
+  });
+
+  els.chatToggle.addEventListener('click', () => {
+    const open = els.chatPanel.hasAttribute('hidden');
+    if (open) els.chatPanel.removeAttribute('hidden');
+    else els.chatPanel.setAttribute('hidden', '');
+    els.chatToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  els.chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const message = els.chatInput.value.trim();
+    if (!message) return;
+    els.chatInput.value = '';
+    sendChat(message).catch((err) => {
+      appendChat('assistant', err.message);
+    });
   });
 
   els.form.addEventListener('submit', (e) => {
@@ -402,10 +594,10 @@
     if (e.key === 'Escape') closeCart();
   });
 
-  // Boot
   initTheme();
   renderCart();
-  Promise.all([checkHealth(), loadMeta(), loadPhones()]).catch((err) => {
+  renderAuth();
+  Promise.all([checkHealth(), loadMeta(), loadPhones(), loadFlash()]).catch((err) => {
     toast(err.message);
     els.stats.textContent = 'Could not load inventory. Is the API running?';
   });

@@ -1,4 +1,18 @@
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   web:
     build: .
     ports:
@@ -7,9 +21,20 @@ services:
       PORT: 3000
       NODE_ENV: production
       DATABASE_PATH: /app/data/phones.db
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: change-me-in-production-oldphonestore
+      ORDER_TIMEOUT_MINUTES: "15"
+      # Optional LLM for smarter chat (leave empty to use local RAG + tools)
+      # OPENAI_API_KEY:
+      # OPENAI_BASE_URL: https://api.openai.com/v1
+      # OPENAI_MODEL: gpt-4o-mini
     volumes:
       - phone-data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:
   phone-data:
+  redis-data:
