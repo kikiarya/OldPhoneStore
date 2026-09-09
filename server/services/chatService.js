@@ -167,44 +167,40 @@ async function callLlm(messages) {
 
 function buildLocalReply(userText, toolsUsed) {
   const parts = [];
-  parts.push(
-    '我是 OldPhoneStore 智能客服（本地 RAG + Tool 模式；未配置 LLM_API_KEY / OPENAI_API_KEY 时走规则引擎）。'
-  );
+  parts.push('您好，我是 OldPhoneStore 客服助手，可以帮您咨询保修、物流、商品和订单。');
 
   if (toolsUsed.faq?.length) {
-    parts.push('\n【知识库】');
+    parts.push('');
     for (const f of toolsUsed.faq) {
-      parts.push(`• ${f.question}\n  ${f.answer}`);
+      parts.push(f.answer);
     }
   }
   if (toolsUsed.phones?.length) {
-    parts.push('\n【商品检索】');
+    parts.push('\n为您找到这些机型：');
     for (const p of toolsUsed.phones) {
       parts.push(
-        `• #${p.id} ${p.brand} ${p.model} ${p.storage} — $${p.price} (${p.condition}) ${p.available ? '有货' : '已售'}`
+        `• ${p.brand} ${p.model} ${p.storage} — $${p.price}（${p.condition}）${p.available ? '' : ' · 已售出'}`
       );
     }
   }
   if (toolsUsed.order) {
-    parts.push('\n【订单】');
+    parts.push('\n订单信息：');
     if (toolsUsed.order.error) {
       parts.push(toolsUsed.order.error);
     } else {
       parts.push(
-        `单号 ${toolsUsed.order.order_no || '(pending)'} · 状态 ${toolsUsed.order.status} · 合计 $${toolsUsed.order.total}`
+        `单号 ${toolsUsed.order.order_no || '—'} · ${toolsUsed.order.status} · $${toolsUsed.order.total}`
       );
     }
   }
   if (toolsUsed.flash?.length) {
-    parts.push('\n【限时秒杀】');
+    parts.push('\n当前限时优惠：');
     for (const d of toolsUsed.flash) {
-      parts.push(`• #${d.id} ${d.title} $${d.price} · 剩余 ${d.remaining}`);
+      parts.push(`• ${d.title} $${d.price} · 剩余 ${d.remaining}`);
     }
   }
   if (parts.length === 1) {
-    parts.push(
-      `\n你可以问：保修政策、退货、成色说明，或说「推荐 iPhone」「查订单 OPS…」「有哪些秒杀」。\n你刚才说：${userText}`
-    );
+    parts.push('\n您可以问保修、退货、成色，或说「推荐 iPhone」「查订单」「有什么优惠」。');
   }
   return parts.join('\n');
 }

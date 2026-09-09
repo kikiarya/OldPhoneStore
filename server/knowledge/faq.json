@@ -27,18 +27,18 @@
     "id": "payment",
     "tags": ["payment", "pay", "支付", "付款"],
     "question": "How do I pay?",
-    "answer": "This demo uses pending → paid status transitions (no real gateway). In production you would plug Stripe / WeChat / Alipay webhooks with idempotent callbacks."
+    "answer": "After checkout, confirm payment on the order page to complete your purchase. We email a receipt once payment is confirmed."
   },
   {
     "id": "flash",
     "tags": ["flash", "seckill", "秒杀", "限时"],
     "question": "How does flash sale work?",
-    "answer": "Flash deals use Redis + Lua for atomic stock checks and one-deal-per-user. Successful claims are pushed to a Redis Stream and written to SQLite asynchronously."
+    "answer": "Flash deals are limited-time offers with limited stock. Each account can claim one unit per deal while supplies last."
   },
   {
     "id": "imei",
     "tags": ["imei", "blacklist", "解锁"],
     "question": "Are phones unlocked / clean IMEI?",
-    "answer": "Listings show a masked IMEI. Demo inventory is treated as carrier-unlocked and blacklist-checked before listing."
+    "answer": "Listings show a masked IMEI. Devices are carrier-unlocked and blacklist-checked before they go on sale."
   }
 ]
