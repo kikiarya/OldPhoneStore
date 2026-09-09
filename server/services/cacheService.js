@@ -1,5 +1,5 @@
 /**
- * Portfolio cache layer — mirrors 黑马点评 "商户查询缓存" patterns:
+ * Cache layer:
  * - Cache Aside
  * - Empty-value cache against penetration
  * - Mutex lock against hot-key stampede (击穿)

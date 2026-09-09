@@ -76,7 +76,7 @@ function stopOrderWorker() {
 }
 
 /**
- * Cancel unpaid cart orders older than N minutes (苍穹外卖超时关单).
+ * Cancel unpaid cart orders older than N minutes.
  */
 function cancelStalePendingOrders(minutes = 15) {
   const { getDb } = require('../db');
