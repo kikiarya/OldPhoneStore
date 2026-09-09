@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OldPhoneStore — Certified Pre-Owned Phones</title>
+  <meta name="description" content="Shop certified refurbished smartphones. Inspected, warranted, ready to ship.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#catalog">Skip to catalog</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/" aria-label="OldPhoneStore home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">OldPhoneStore</span>
+      </a>
+      <nav class="header-actions" aria-label="Primary">
+        <button type="button" id="theme-toggle" class="btn ghost" aria-pressed="false">Dark</button>
+        <button type="button" id="cart-open" class="btn cart-btn" aria-controls="cart-drawer" aria-expanded="false">
+          Cart <span id="cart-count" class="cart-count">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero" aria-labelledby="hero-brand">
+    <div class="hero-atmosphere" aria-hidden="true"></div>
+    <div class="hero-content">
+      <p class="hero-brand" id="hero-brand">OldPhoneStore</p>
+      <h1 class="hero-headline">Phones worth keeping — prices worth switching for.</h1>
+      <p class="hero-sub">Every device is inspected, graded, and backed by a 90-day warranty.</p>
+      <div class="hero-cta">
+        <a class="btn primary" href="#catalog">Browse inventory</a>
+        <a class="btn ghost" href="#how-it-works">How it works</a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-phone hero-phone-a"></div>
+      <div class="hero-phone hero-phone-b"></div>
+    </div>
+  </section>
+
+  <main id="catalog" class="catalog">
+    <div class="catalog-toolbar">
+      <h2 class="section-title">Live inventory</h2>
+      <p class="section-sub" id="inventory-stats">Loading stock…</p>
+
+      <form id="filter-form" class="filters" role="search">
+        <label class="field grow">
+          <span class="label">Search</span>
+          <input type="search" id="search-input" name="q" placeholder="Model, brand, color…" autocomplete="off">
+        </label>
+        <label class="field">
+          <span class="label">Brand</span>
+          <select id="category-filter" name="category">
+            <option value="All">All brands</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="label">Condition</span>
+          <select id="condition-filter" name="condition">
+            <option value="All">Any</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="label">Availability</span>
+          <select id="available-filter" name="available">
+            <option value="">All</option>
+            <option value="1">In stock</option>
+            <option value="0">Sold</option>
+          </select>
+        </label>
+        <div class="filter-actions">
+          <button type="submit" class="btn primary">Apply</button>
+          <button type="button" id="reset-filters" class="btn ghost">Reset</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="phone-grid" class="phone-grid" aria-live="polite"></div>
+    <p id="empty-state" class="empty-state hidden">No phones match those filters. Try another search.</p>
+  </main>
+
+  <section id="how-it-works" class="how">
+    <h2 class="section-title">How it works</h2>
+    <p class="section-sub">Three steps from listing to your pocket.</p>
+    <ol class="how-steps">
+      <li><strong>We inspect</strong> — battery, IMEI blacklist, cameras, and ports.</li>
+      <li><strong>You choose</strong> — grade, storage, and price that fit.</li>
+      <li><strong>We ship</strong> — insured delivery with a 90-day warranty.</li>
+    </ol>
+  </section>
+
+  <footer class="site-footer">
+    <p><strong>OldPhoneStore</strong> — certified pre-owned smartphones.</p>
+    <p class="muted">API health: <span id="api-status">checking…</span></p>
+  </footer>
+
+  <aside id="cart-drawer" class="cart-drawer" aria-hidden="true" aria-labelledby="cart-title">
+    <div class="cart-panel">
+      <header class="cart-header">
+        <h2 id="cart-title">Your cart</h2>
+        <button type="button" id="cart-close" class="btn ghost" aria-label="Close cart">Close</button>
+      </header>
+      <ul id="cart-items" class="cart-items"></ul>
+      <p id="cart-empty" class="muted">Cart is empty. Add a phone from the catalog.</p>
+      <div class="cart-footer">
+        <p class="cart-total">Total <strong id="cart-total">$0.00</strong></p>
+        <label class="field">
+          <span class="label">Name</span>
+          <input type="text" id="checkout-name" placeholder="Optional">
+        </label>
+        <label class="field">
+          <span class="label">Email</span>
+          <input type="email" id="checkout-email" placeholder="you@example.com">
+        </label>
+        <button type="button" id="checkout-btn" class="btn primary" disabled>Place order</button>
+        <button type="button" id="clear-cart" class="btn ghost">Clear cart</button>
+      </div>
+    </div>
+  </aside>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="detail-dialog" class="detail-dialog">
+    <form method="dialog" class="detail-inner">
+      <button type="submit" class="btn ghost detail-close" value="close">Close</button>
+      <div id="detail-body"></div>
+    </form>
+  </dialog>
+
+  <script src="/js/app.js" defer></script>
+</body>
+</html>
